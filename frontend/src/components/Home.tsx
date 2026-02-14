@@ -1,14 +1,16 @@
 import React from "react";
+import {useNavigate} from "react-router-dom";
 import "../styles/Home.css";
 
 const Home: React.FC = () => {
+  const navigate = useNavigate();
   return (
     <div className="home-container">
       {/* Navbar */}
       <nav className="navbar">
         <h1 className="logo">QuizBuilder</h1>
         <div>
-          <button className="nav-btn">Login</button>
+          <button className="nav-btn" onClick={() => navigate("/login")}>Login</button>
           <button className="nav-btn signup">Sign Up</button>
         </div>
       </nav>
