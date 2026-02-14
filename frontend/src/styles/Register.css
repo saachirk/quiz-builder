@@ -1,0 +1,64 @@
+.register-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a103d, #2b1b5e);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.register-card {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 40px;
+  border-radius: 16px;
+  width: 350px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 20px rgba(138, 43, 226, 0.4);
+  text-align: center;
+  color: white;
+}
+
+.register-card h2 {
+  margin-bottom: 20px;
+}
+
+.role-selector {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.role-btn {
+  flex: 1;
+  margin: 5px;
+  padding: 8px;
+  border: none;
+  background: transparent;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid #a855f7;
+}
+
+.role-btn.active {
+  background: #a855f7;
+}
+
+.register-card input {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 8px;
+  border: none;
+}
+
+.register-btn {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  background: #a855f7;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
