@@ -1,0 +1,142 @@
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: #0f0a1f;
+}
+
+.quiz-wrapper {
+  text-align: center;
+  padding: 60px 20px;
+  color: #f3f4f6;
+}
+
+.quiz-title {
+  font-size: 34px;
+  font-weight: 600;
+  color: #a78bfa;
+  letter-spacing: 1px;
+}
+
+.question-count {
+  margin-top: 8px;
+  color: #c4b5fd;
+  font-weight: 500;
+}
+
+.progress-bar {
+  width: 80%;
+  max-width: 850px;
+  height: 10px;
+  background-color: #1c1534;
+  margin: 30px auto 50px auto;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+  transition: width 0.3s ease;
+}
+
+.quiz-card {
+  background: #1c1534;
+  max-width: 850px;
+  margin: 0 auto;
+  padding: 50px;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(139, 92, 246, 0.2);
+  text-align: left;
+}
+
+.question-text {
+  font-size: 22px;
+  margin-bottom: 35px;
+  color: #ffffff;
+  line-height: 1.6;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px;
+  border-radius: 14px;
+  border: 2px solid #312e81;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: #141028;
+}
+
+.option input {
+  accent-color: #8b5cf6;
+  width: 18px;
+  height: 18px;
+}
+
+.option span {
+  font-size: 16px;
+  color: #f3f4f6;
+}
+
+.option:hover {
+  border-color: #8b5cf6;
+  background-color: #1f1a3d;
+}
+
+.option.active {
+  border-color: #a78bfa;
+  background-color: #221c44;
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+}
+
+.button-area {
+  margin-top: 40px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.prev-btn,
+.next-btn,
+.submit-btn {
+  padding: 12px 26px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.prev-btn {
+  background-color: #221c44;
+  color: #c4b5fd;
+}
+
+.prev-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.next-btn {
+  background-color: #8b5cf6;
+  color: white;
+}
+
+.submit-btn {
+  background-color: #a78bfa;
+  color: #0f0a1f;
+}
+
+.prev-btn:hover:not(:disabled),
+.next-btn:hover,
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
+}
