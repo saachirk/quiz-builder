@@ -12,6 +12,7 @@ const Home: React.FC = () => {
         <div>
           <button className="nav-btn" onClick={() => navigate("/login")}>Login</button>
           <button className="nav-btn signup" onClick={() => navigate("/register")}>Sign Up</button>
+          <button className="nav-btn Dashboard" onClick={() => navigate("/dashboard")}>Dashboard</button>
         </div>
       </nav>
 
