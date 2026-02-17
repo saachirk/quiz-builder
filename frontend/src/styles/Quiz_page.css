@@ -1,0 +1,139 @@
+/* QuizPage scoped CSS */
+.quiz-wrapper {
+  text-align: center;
+  padding: 60px 20px;
+  color: #f3f4f6;
+  font-family: "Segoe UI", sans-serif;
+  background: #0f0a1f;
+}
+
+.quiz-wrapper .quiz-title {
+  font-size: 34px;
+  font-weight: 600;
+  color: #a78bfa;
+  letter-spacing: 1px;
+}
+
+.quiz-wrapper .question-count {
+  margin-top: 8px;
+  color: #c4b5fd;
+  font-weight: 500;
+}
+
+.quiz-wrapper .progress-bar {
+  width: 80%;
+  max-width: 850px;
+  height: 10px;
+  background-color: #1c1534;
+  margin: 30px auto 50px auto;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.quiz-wrapper .progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+  transition: width 0.3s ease;
+}
+
+.quiz-wrapper .quiz-card {
+  background: #1c1534;
+  max-width: 850px;
+  margin: 0 auto;
+  padding: 50px;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(139, 92, 246, 0.2);
+  text-align: left;
+}
+
+.quiz-wrapper .question-text {
+  font-size: 22px;
+  margin-bottom: 35px;
+  color: #ffffff;
+  line-height: 1.6;
+}
+
+.quiz-wrapper .options {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.quiz-wrapper .option {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px;
+  border-radius: 14px;
+  border: 2px solid #312e81;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: #141028;
+}
+
+.quiz-wrapper .option input {
+  accent-color: #8b5cf6;
+  width: 18px;
+  height: 18px;
+}
+
+.quiz-wrapper .option span {
+  font-size: 16px;
+  color: #f3f4f6;
+}
+
+.quiz-wrapper .option:hover {
+  border-color: #8b5cf6;
+  background-color: #1f1a3d;
+}
+
+.quiz-wrapper .option.active {
+  border-color: #a78bfa;
+  background-color: #221c44;
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+}
+
+.quiz-wrapper .button-area {
+  margin-top: 40px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.quiz-wrapper .prev-btn,
+.quiz-wrapper .next-btn,
+.quiz-wrapper .submit-btn {
+  padding: 12px 26px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.quiz-wrapper .prev-btn {
+  background-color: #221c44;
+  color: #c4b5fd;
+}
+
+.quiz-wrapper .prev-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.quiz-wrapper .next-btn {
+  background-color: #8b5cf6;
+  color: white;
+}
+
+.quiz-wrapper .submit-btn {
+  background-color: #a78bfa;
+  color: #0f0a1f;
+}
+
+.quiz-wrapper .prev-btn:hover:not(:disabled),
+.quiz-wrapper .next-btn:hover,
+.quiz-wrapper .submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
+}
