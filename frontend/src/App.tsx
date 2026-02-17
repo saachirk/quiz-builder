@@ -5,6 +5,8 @@ import Home from './components/Home';
 import Login from './components/login';
 import Register from "./components/Register";
 import Quiz from "./components/Quiz_page";
+import Result from "./components/Result";
+
 
 
 const App: React.FC = () => {
@@ -16,6 +18,7 @@ const App: React.FC = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/quiz" element={<Quiz />} />
+        <Route path="/result" element={<Result />} />
       </Routes>
     </Router>
   );
