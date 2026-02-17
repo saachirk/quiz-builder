@@ -8,17 +8,29 @@ const Login = () => {
     const [password, setPassword] = useState<string>("");
     const [remember, setRemember] = useState<boolean>(false);
     const [showPassword, setShowPassword] = useState<boolean>(false);
+    const navigate = useNavigate();
 
-    const navigate = useNavigate();   // ✅ NEW
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+        const response = await fetch("http://localhost:8000/api/login/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email, password }),
+        });
 
-    // ✅ simulate login
-    localStorage.setItem("isLoggedIn", "true");
+        const data = await response.json();
 
-    navigate("/quiz-setup");
-};
+        if (response.ok) {
+            alert("Login successful!");
+            console.log(data.user);
+            navigate("/quiz-setup");
+        } else {
+            alert(data.error);
+        }
+    };
 
     return (
         <div className="login-page">
