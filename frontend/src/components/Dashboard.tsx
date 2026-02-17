@@ -12,7 +12,7 @@ import {
   YAxis,
 } from "recharts";
 import "../styles/Dashboard.css";
-import "../components/Navbar";
+
 const pieData = [
   { name: "Correct", value: 78 },
   { name: "Wrong", value: 22 },

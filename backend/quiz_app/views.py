@@ -41,7 +41,6 @@ def register_user(request):
 def login_user(request):
     if request.method == "POST":
         data = json.loads(request.body)
-
         email = data.get("email")
         password = data.get("password")
 
