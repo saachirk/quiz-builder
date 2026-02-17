@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import "../styles/Quiz_page.css";
+import { useNavigate } from "react-router-dom";
 
 interface Question {
   id: number;
   question: string;
   options: string[];
+  correctAnswer: string;
 }
 
 const questions: Question[] = [
@@ -12,32 +14,38 @@ const questions: Question[] = [
     id: 1,
     question: "What is the capital of France?",
     options: ["London", "Berlin", "Paris", "Madrid"],
+    correctAnswer: "Paris",
   },
   {
     id: 2,
     question: "Which language does React use?",
     options: ["Python", "Java", "JavaScript", "C++"],
+    correctAnswer: "JavaScript",
   },
   {
     id: 3,
     question: "Which hook manages state?",
     options: ["useEffect", "useState", "useRef", "useMemo"],
+    correctAnswer: "useState",
   },
   {
     id: 4,
     question: "What is MongoDB?",
     options: ["SQL DB", "NoSQL DB", "Language", "Framework"],
+    correctAnswer: "NoSQL DB",
   },
   {
     id: 5,
     question: "Which company created React?",
     options: ["Google", "Meta", "Microsoft", "Amazon"],
+    correctAnswer: "Meta",
   },
 ];
 
 const QuizPage: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
+  const navigate = useNavigate();
 
   const currentQuestion = questions[currentIndex];
   const progress = ((currentIndex + 1) / questions.length) * 100;
@@ -58,6 +66,31 @@ const QuizPage: React.FC = () => {
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
     }
+  };
+
+  const calculateScore = () => {
+    let score = 0;
+
+    questions.forEach((question, index) => {
+      if (selectedAnswers[index] === question.correctAnswer) {
+        score++;
+      }
+    });
+
+    return score;
+  };
+
+  const handleSubmit = () => {
+    const finalScore = calculateScore();
+
+    navigate("/result", {
+      state: {
+        score: finalScore,
+        totalQuestions: questions.length,
+        questions: questions,
+        selectedAnswers: selectedAnswers,
+      },
+    });
   };
 
   return (
@@ -105,7 +138,9 @@ const QuizPage: React.FC = () => {
           </button>
 
           {currentIndex === questions.length - 1 ? (
-            <button className="submit-btn">Submit</button>
+            <button className="submit-btn" onClick={handleSubmit}>
+              Submit
+            </button>
           ) : (
             <button className="next-btn" onClick={handleNext}>
               Next
