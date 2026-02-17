@@ -1,18 +1,42 @@
 import React from "react";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "../styles/Home.css";
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
+
+  // ✅ NEW: Create Quiz logic
+  const handleCreateQuiz = () => {
+    const user = localStorage.getItem("user");
+
+    if (!user) {
+      navigate("/login");       // redirect if not logged in
+    } else {
+      navigate("/quiz-setup");  // go to quiz setup if logged in
+    }
+  };
+
   return (
     <div className="home-container">
       {/* Navbar */}
       <nav className="navbar">
         <h1 className="logo">QuizBuilder</h1>
         <div>
-          <button className="nav-btn" onClick={() => navigate("/login")}>Login</button>
-          <button className="nav-btn signup" onClick={() => navigate("/register")}>Sign Up</button>
-          <button className="nav-btn Dashboard" onClick={() => navigate("/dashboard")}>Dashboard</button>
+          <button className="nav-btn" onClick={() => navigate("/login")}>
+            Login
+          </button>
+          <button
+            className="nav-btn signup"
+            onClick={() => navigate("/register")}
+          >
+            Sign Up
+          </button>
+          <button
+            className="nav-btn Dashboard"
+            onClick={() => navigate("/dashboard")}
+          >
+            Dashboard
+          </button>
         </div>
       </nav>
 
@@ -26,7 +50,11 @@ const Home: React.FC = () => {
           real-time leaderboards.
         </p>
         <div className="hero-buttons">
-          <button className="primary-btn">Create Quiz</button>
+          {/* ✅ UPDATED BUTTON */}
+          <button className="primary-btn" onClick={handleCreateQuiz}>
+            Create Quiz
+          </button>
+
           <button className="secondary-btn">Join Quiz</button>
         </div>
       </section>

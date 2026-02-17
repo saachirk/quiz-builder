@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "../styles/Quiz_page.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom"; // ✅ UPDATED
 
 interface Question {
   id: number;
@@ -46,6 +46,13 @@ const QuizPage: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
   const navigate = useNavigate();
+  const location = useLocation(); // ✅ NEW
+
+  // ✅ Receive setup data (if coming from quiz setup)
+  const { topic, difficulty } = location.state || {
+    topic: "General Knowledge",
+    difficulty: "medium",
+  };
 
   const currentQuestion = questions[currentIndex];
   const progress = ((currentIndex + 1) / questions.length) * 100;
@@ -70,13 +77,11 @@ const QuizPage: React.FC = () => {
 
   const calculateScore = () => {
     let score = 0;
-
     questions.forEach((question, index) => {
       if (selectedAnswers[index] === question.correctAnswer) {
         score++;
       }
     });
-
     return score;
   };
 
@@ -96,6 +101,12 @@ const QuizPage: React.FC = () => {
   return (
     <div className="quiz-wrapper">
       <h1 className="quiz-title">Quiz Builder</h1>
+
+      {/* ✅ NEW: Show quiz info */}
+      <p className="quiz-info">
+        Topic: <b>{topic}</b> | Difficulty: <b>{difficulty}</b>
+      </p>
+
       <p className="question-count">
         Question {currentIndex + 1} of {questions.length}
       </p>

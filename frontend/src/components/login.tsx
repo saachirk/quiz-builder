@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { useNavigate } from "react-router-dom";   // ✅ NEW
 import "../styles/login.css";
 
 const Login = () => {
@@ -8,10 +9,16 @@ const Login = () => {
     const [remember, setRemember] = useState<boolean>(false);
     const [showPassword, setShowPassword] = useState<boolean>(false);
 
+    const navigate = useNavigate();   // ✅ NEW
+
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        console.log({ email, password, remember });
-    };
+    e.preventDefault();
+
+    // ✅ simulate login
+    localStorage.setItem("isLoggedIn", "true");
+
+    navigate("/quiz-setup");
+};
 
     return (
         <div className="login-page">

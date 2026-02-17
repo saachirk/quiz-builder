@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../styles/Result.css";
 
@@ -12,6 +12,7 @@ interface Question {
 const Result: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [showReview, setShowReview] = useState(false);
 
   // SAFE ACCESS (prevents crash)
   const score = location.state?.score ?? 0;
@@ -186,7 +187,21 @@ const Result: React.FC = () => {
             <div style={percentageStyle}>{percentage}%</div>
             <div style={messageStyle}>{getPerformanceMessage()}</div>
 
+            <button 
+              style={{
+                ...buttonStyle,
+                backgroundColor: showReview ? "#ef4444" : "#10b981",
+                marginTop: "25px"
+              }}
+              onClick={() => setShowReview(!showReview)}
+              onMouseEnter={(e) => handleButtonHover(e, true)}
+              onMouseLeave={(e) => handleButtonHover(e, false)}
+            >
+              {showReview ? "Hide Answers" : "Review Your Answers"}
+            </button>
+
             {/* Display all questions with answers */}
+            {showReview && (
             <div style={{ marginTop: "30px", textAlign: "left" }}>
               <h3 style={{ fontSize: "20px", marginBottom: "20px", color: "#c7d2fe" }}>Review Your Answers</h3>
               {questions.map((question: Question, index: number) => {
@@ -219,6 +234,7 @@ const Result: React.FC = () => {
                 );
               })}
             </div>
+            )}
           </>
         ) : (
           <>
