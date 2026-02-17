@@ -21,7 +21,9 @@ const QuizSetup: React.FC = () => {
   };
 
   return (
+    
     <div className="setup-wrapper">
+      
       <div className="setup-card">
         <h1>Create Your Quiz</h1>
 
