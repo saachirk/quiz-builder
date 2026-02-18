@@ -6,7 +6,7 @@ import "../styles/Register.css";
 
 
 const Register = () => {
-  const navigate = useNavigate();  
+  const navigate = useNavigate();
   const [role, setRole] = useState("student");
   const [formData, setFormData] = useState({
     name: "",
@@ -22,9 +22,25 @@ const Register = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form Data:", { ...formData, role });
+
+    const response = await fetch("http://localhost:8000/api/register/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ...formData, role }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert("Registration successful!");
+      navigate("/login");
+    } else {
+      alert(data.error);
+    }
   };
 
   return (
