@@ -172,13 +172,16 @@
   opacity: 0.8;
 }
 
-.login-page .signup-text span {
+.login-page .signup-link {
   font-weight: 600;
   cursor: pointer;
+  color: #9333ea;
+  transition: all 0.2s ease;
 }
 
-.login-page .signup-text span:hover {
+.login-page .signup-link:hover {
   text-decoration: underline;
+  opacity: 1;
 }
 
 /* Ensure login-page centering is not affected by global styles */
