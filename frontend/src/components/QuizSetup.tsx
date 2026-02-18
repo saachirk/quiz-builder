@@ -32,7 +32,7 @@ const QuizSetup: React.FC = () => {
           <label>Quiz Topic</label>
           <input
             type="text"
-            placeholder="e.g. Machine Learning"
+            placeholder="Enter your topic"
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
           />
