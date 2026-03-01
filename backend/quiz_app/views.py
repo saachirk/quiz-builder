@@ -4,37 +4,57 @@ import bcrypt
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .mongo import users_collection
+import logging
+
+logger = logging.getLogger(__name__)
 
 @csrf_exempt
 def register_user(request):
     if request.method == "POST":
-        data = json.loads(request.body)
+        try:
+            data = json.loads(request.body)
 
-        name = data.get("name")
-        email = data.get("email")
-        password = data.get("password")
-        confirm_password = data.get("confirmPassword")
-        role = data.get("role")
+            name = data.get("name")
+            email = data.get("email")
+            password = data.get("password")
+            confirm_password = data.get("confirmPassword")
+            role = data.get("role")
 
-        #password match confirm password
-        if password != confirm_password:
-            return JsonResponse({"error" : "Passwords do not match"},status = 400)
+            # Check if required fields are present
+            if not all([name, email, password, confirm_password, role]):
+                return JsonResponse({"error": "All fields are required"}, status=400)
+
+            #password match confirm password
+            if password != confirm_password:
+                return JsonResponse({"error": "Passwords do not match"}, status=400)
+            
+            #to check if email exists
+            if users_collection.find_one({"email": email}):
+                return JsonResponse({"error": "Email already exists"}, status=400)
+            
+            #hashed password
+            hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+
+            # Insert user into MongoDB
+            result = users_collection.insert_one({
+                "name": name,
+                "email": email,
+                "password": hashed_password,
+                "role": role
+            })
+
+            logger.info(f"User registered successfully: {email}, ID: {result.inserted_id}")
+
+            return JsonResponse({"message": "User registered successfully"}, status=201)
         
-        #to check if email exists
-        if users_collection.find_one({"email" : email}):
-            return JsonResponse({"error" : "Email already exists"},status = 400)
-        
-        #hashed password
-        hashed_password = bcrypt.hashpw(password.encode("utf-8"),bcrypt.gensalt())
-
-        users_collection.insert_one({
-            "name" : name,
-            "email" : email,
-            "password" : hashed_password,
-            "role" : role
-        })
-
-        return JsonResponse({"message": "User registered successfully"}, status=201)
+        except json.JSONDecodeError:
+            logger.error("Invalid JSON in request body")
+            return JsonResponse({"error": "Invalid request data"}, status=400)
+        except Exception as e:
+            logger.error(f"Error during registration: {str(e)}")
+            return JsonResponse({"error": f"Registration failed: {str(e)}"}, status=500)
+    
+    return JsonResponse({"error": "Invalid request method"}, status=405)
         
 
 @csrf_exempt
