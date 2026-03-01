@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-client = MongoClient(os.getenv("mongodb+srv://saachirkattics24_db_user:GF9rCuZbWwAy2PGU@quiz.lkuciey.mongodb.net/?appName=Quiz"))
+client = MongoClient(os.getenv("URI"))
 
 db = client["quiz_db"]
 
