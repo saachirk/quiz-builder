@@ -61,21 +61,27 @@ const Register = () => {
       return;
     }
 
-    const response = await fetch("http://localhost:8000/api/register/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ ...formData, role }),
-    });
+    try {
+      const response = await fetch("http://localhost:8000/api/register/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ...formData, role }),
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (response.ok) {
-      alert("Registration successful!");
-      navigate("/login");
-    } else {
-      alert(data.error);
+      if (response.ok) {
+        alert("Registration successful!");
+        navigate("/login");
+      } else {
+        console.error("Registration error response:", data);
+        alert(data.error || "Registration failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Network error during registration:", error);
+      alert("Network error. Please check if the server is running and try again.");
     }
   };
 
