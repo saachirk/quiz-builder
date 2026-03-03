@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/Quiz_page.css";
-import { useNavigate, useLocation } from "react-router-dom"; // ✅ UPDATED
+import { useNavigate, useLocation } from "react-router-dom";
+
+// ✅ Centralized API URL
+const API_URL = "http://127.0.0.1:8000";
 
 interface Question {
   id: number;
@@ -9,50 +12,77 @@ interface Question {
   correctAnswer: string;
 }
 
-const questions: Question[] = [
-  {
-    id: 1,
-    question: "What is the capital of France?",
-    options: ["London", "Berlin", "Paris", "Madrid"],
-    correctAnswer: "Paris",
-  },
-  {
-    id: 2,
-    question: "Which language does React use?",
-    options: ["Python", "Java", "JavaScript", "C++"],
-    correctAnswer: "JavaScript",
-  },
-  {
-    id: 3,
-    question: "Which hook manages state?",
-    options: ["useEffect", "useState", "useRef", "useMemo"],
-    correctAnswer: "useState",
-  },
-  {
-    id: 4,
-    question: "What is MongoDB?",
-    options: ["SQL DB", "NoSQL DB", "Language", "Framework"],
-    correctAnswer: "NoSQL DB",
-  },
-  {
-    id: 5,
-    question: "Which company created React?",
-    options: ["Google", "Meta", "Microsoft", "Amazon"],
-    correctAnswer: "Meta",
-  },
-];
-
 const QuizPage: React.FC = () => {
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
-  const navigate = useNavigate();
-  const location = useLocation(); // ✅ NEW
 
-  // ✅ Receive setup data (if coming from quiz setup)
-  const { topic, difficulty } = location.state || {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const { topic, difficulty, numQuestions } = location.state || {
     topic: "General Knowledge",
     difficulty: "medium",
+    numQuestions: 5,
   };
+
+  // ✅ Fetch Quiz from Django
+  useEffect(() => {
+    const fetchQuiz = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/generate-quiz/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            topic,
+            numberOfQuestions: numQuestions,
+            difficulty,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to generate quiz");
+        }
+
+        const data = await response.json();
+
+        const formattedQuestions: Question[] = data.questions.map(
+          (q: any, index: number) => ({
+            id: index + 1,
+            question: q.question,
+            options: q.options,
+            correctAnswer: q.correctAnswer,
+          })
+        );
+
+        setQuestions(formattedQuestions);
+      } catch (err) {
+        console.error("API ERROR:", err);
+        setError("Something went wrong while generating quiz.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchQuiz();
+  }, [topic, difficulty, numQuestions]);
+
+  if (loading) {
+    return <div className="quiz-wrapper">Generating quiz...</div>;
+  }
+
+  if (error) {
+    return <div className="quiz-wrapper">{error}</div>;
+  }
+
+  if (questions.length === 0) {
+    return <div className="quiz-wrapper">No questions generated.</div>;
+  }
 
   const currentQuestion = questions[currentIndex];
   const progress = ((currentIndex + 1) / questions.length) * 100;
@@ -92,8 +122,10 @@ const QuizPage: React.FC = () => {
       state: {
         score: finalScore,
         totalQuestions: questions.length,
-        questions: questions,
-        selectedAnswers: selectedAnswers,
+        questions,
+        selectedAnswers,
+        topic,
+        difficulty,
       },
     });
   };
@@ -102,7 +134,6 @@ const QuizPage: React.FC = () => {
     <div className="quiz-wrapper">
       <h1 className="quiz-title">Quiz Builder</h1>
 
-      {/* ✅ NEW: Show quiz info */}
       <p className="quiz-info">
         Topic: <b>{topic}</b> | Difficulty: <b>{difficulty}</b>
       </p>

@@ -5,6 +5,10 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .mongo import users_collection
 import logging
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .hugginface_service import generate_quiz
+from .mongo import get_db  # assuming you have mongo.py setup
 
 logger = logging.getLogger(__name__)
 
@@ -80,4 +84,42 @@ def login_user(request):
                 "role" : user["role"]
             }
         })
+    
 
+@api_view(["POST"])
+def generate_quiz_view(request):
+    try:
+        topic = request.data.get("topic")
+        number_of_questions = request.data.get("numberOfQuestions")
+        difficulty = request.data.get("difficulty")
+
+        print("Received:", topic, number_of_questions, difficulty)
+
+        if not topic or not number_of_questions:
+            return Response({"error": "Missing fields"}, status=400)
+
+        # Convert to integer
+        number_of_questions = int(number_of_questions)
+
+        quiz = generate_quiz(topic, number_of_questions, difficulty)
+
+        if not quiz:
+            return Response({"error": "Quiz generation failed"}, status=500)
+
+        db = get_db()
+        quiz_collection = db["quizzes"]
+
+        result = quiz_collection.insert_one({
+            "topic": topic,
+            "difficulty": difficulty,
+            "questions": quiz
+        })
+
+        return Response({
+            "quizId": str(result.inserted_id),
+            "questions": quiz
+        })
+
+    except Exception as e:
+        print("ERROR IN GENERATE QUIZ VIEW:", str(e))
+        return Response({"error": str(e)}, status=500)
