@@ -8,7 +8,10 @@ import logging
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .hugginface_service import generate_quiz
-from .mongo import get_db  # assuming you have mongo.py setup
+from datetime import datetime
+import uuid
+from bson import ObjectId
+from .mongo import get_db, sessions_collection, quiz_collection, result_collection  # assuming you have mongo.py setup
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +52,7 @@ def register_user(request):
 
             logger.info(f"User registered successfully: {email}, ID: {result.inserted_id}")
 
-            return JsonResponse({"message": "User registered successfully"}, status=201)
+            return JsonResponse({"message": "User registered successfully", "user": {"name": name, "email": email, "role": role}}, status=201)
         
         except json.JSONDecodeError:
             logger.error("Invalid JSON in request body")
@@ -122,4 +125,122 @@ def generate_quiz_view(request):
 
     except Exception as e:
         print("ERROR IN GENERATE QUIZ VIEW:", str(e))
+        return Response({"error": str(e)}, status=500)
+
+@api_view(["POST"])
+def start_quiz(request):
+    try:
+        session_id = str(uuid.uuid4())
+        data = request.data
+        quiz_id = data.get("quizId")
+        topic = data.get("topic")
+        duration = 600  # 10 minutes total
+        session_doc = {
+            "session_id": session_id,
+            "quiz_id": quiz_id,
+            "topic": topic,
+            "start_time": datetime.utcnow().isoformat(),
+            "switches": 0,
+            "duration": duration,
+            "expired": False
+        }
+        sessions_collection.insert_one(session_doc)
+        return Response({
+            "session_id": session_id,
+            "duration": duration
+        })
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
+@api_view(["POST"])
+def get_time_left(request):
+    try:
+        data = request.data
+        session_id = data.get("session_id")
+        session = sessions_collection.find_one({"session_id": session_id})
+        if not session:
+            return Response({"error": "Session not found"}, status=404)
+        start_time_str = session["start_time"]
+        if start_time_str.endswith('Z'):
+            start_time_str = start_time_str[:-1] + '+00:00'
+        start_time = datetime.fromisoformat(start_time_str)
+        elapsed = (datetime.utcnow() - start_time).total_seconds()
+        time_left = max(0, session["duration"] - elapsed)
+        expired = time_left <= 0 or session["switches"] >= 5
+        return Response({
+            "time_left": int(time_left),
+            "expired": expired,
+            "switches": session["switches"]
+        })
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
+@api_view(["POST"])
+def report_switch(request):
+    try:
+        data = request.data
+        session_id = data.get("session_id")
+        result = sessions_collection.find_one_and_update(
+            {"session_id": session_id},
+            {"$inc": {"switches": 1}},
+            return_document=True
+        )
+        if not result:
+            return Response({"error": "Session not found"}, status=404)
+        if result["switches"] >= 5:
+            return Response({"expired": True})
+        return Response({"switches": result["switches"]})
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
+@api_view(["POST"])
+def submit_quiz(request):
+    try:
+        data = request.data
+        session_id = data.get("session_id")
+        answers = data.get("answers", [])
+        session = sessions_collection.find_one({"session_id": session_id})
+        if not session:
+            return Response({"error": "Session not found"}, status=404)
+        # Validate time/switches
+        start_time_str = session["start_time"]
+        if start_time_str.endswith('Z'):
+            start_time_str = start_time_str[:-1] + '+00:00'
+        start_time = datetime.fromisoformat(start_time_str)
+        elapsed = (datetime.utcnow() - start_time).total_seconds()
+        time_left = session["duration"] - elapsed
+        if time_left <= 0 or session["switches"] >= 5:
+            return Response({"error": "Time up or too many tab switches"}, status=403)
+        # Get quiz
+        quiz_id = session["quiz_id"]
+        quiz_doc = quiz_collection.find_one({"_id": ObjectId(quiz_id)})
+        if not quiz_doc:
+            return Response({"error": "Quiz not found"}, status=404)
+        questions = quiz_doc["questions"]
+        # Score server-side
+        score = 0
+        total = len(questions)
+        for i in range(total):
+            if i < len(answers) and answers[i] == questions[i]["correctAnswer"]:
+                score += 1
+        # Save result
+        result_doc = {
+            "session_id": session_id,
+            "quiz_id": quiz_id,
+            "score": score,
+            "total": total,
+            "answers": answers,
+            "submit_elapsed": elapsed,
+            "switches": session["switches"]
+        }
+        result_collection.insert_one(result_doc)
+        # Mark expired
+        sessions_collection.update_one({"session_id": session_id}, {"$set": {"expired": True}})
+        return Response({
+            "score": score,
+            "total": total,
+            "topic": session["topic"],
+            "switches": session["switches"]
+        })
+    except Exception as e:
         return Response({"error": str(e)}, status=500)

@@ -11,6 +11,7 @@ db = client["quiz_db"]
 users_collection = db["users"]
 quiz_collection = db["quizzes"]
 result_collection = db["results"]
+sessions_collection = db["sessions"]
 
 def get_db():
     return db
