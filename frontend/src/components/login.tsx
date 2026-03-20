@@ -25,7 +25,8 @@ const Login = () => {
 
         if (response.ok) {
             alert("Login successful!");
-            console.log(data.user);
+            localStorage.setItem('userName', data.user.name);
+            localStorage.setItem('userEmail', data.user.email);
             navigate("/quiz-setup");
         } else {
             alert(data.error);

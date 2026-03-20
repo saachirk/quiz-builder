@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../styles/Result.css";
 
@@ -13,6 +13,12 @@ const Result: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [showReview, setShowReview] = useState(false);
+  const [userName, setUserName] = useState('User');
+
+  useEffect(() => {
+    const name = localStorage.getItem('userName') || 'User';
+    setUserName(name);
+  }, []);
 
   // SAFE ACCESS (prevents crash)
   const score = location.state?.score ?? 0;
@@ -134,13 +140,11 @@ const Result: React.FC = () => {
   const retakeBtnStyle: React.CSSProperties = {
     ...buttonStyle,
     backgroundColor: "#6366f1",
-    border: "none",
   };
 
   const homeBtnStyle: React.CSSProperties = {
     ...buttonStyle,
     backgroundColor: "#8b5cf6",
-    border: "none",
   };
 
   const questionItemStyle: React.CSSProperties = {
@@ -177,93 +181,102 @@ const Result: React.FC = () => {
   });
 
   return (
-    <div style={containerStyle}>
-      <div style={cardStyle}>
-        {hasData ? (
-          <>
-            <h1 style={titleStyle}>Quiz Result</h1>
-            <div style={scoreStyle}>Your Score</div>
-            <div style={detailsStyle}>{score} out of {totalQuestions} questions correct</div>
-            <div style={percentageStyle}>{percentage}%</div>
-            <div style={messageStyle}>{getPerformanceMessage()}</div>
+    <>
+      {/* Watermark for Result page */}
+      <div className="watermark-result">
+        <div>User: {userName}</div>
+        <div>Completed: {new Date().toLocaleString()} - Quiz Result</div>
+      </div>
 
+      <div style={containerStyle}>
+        <div style={cardStyle}>
+          {hasData ? (
+            <>
+              <h1 style={titleStyle}>Quiz Result</h1>
+              <div style={scoreStyle}>Your Score</div>
+              <div style={detailsStyle}>{score} out of {totalQuestions} questions correct</div>
+              <div style={percentageStyle}>{percentage}%</div>
+              <div style={messageStyle}>{getPerformanceMessage()}</div>
+
+              <button 
+                style={{
+                  ...buttonStyle,
+                  backgroundColor: showReview ? "#ef4444" : "#10b981",
+                  marginTop: "25px"
+                }}
+                onClick={() => setShowReview(!showReview)}
+                onMouseEnter={(e) => handleButtonHover(e, true)}
+                onMouseLeave={(e) => handleButtonHover(e, false)}
+              >
+                {showReview ? "Hide Answers" : "Review Your Answers"}
+              </button>
+
+              {/* Display all questions with answers */}
+              {showReview && (
+                <div style={{ marginTop: "30px", textAlign: "left" }}>
+                  <h3 style={{ fontSize: "20px", marginBottom: "20px", color: "#c7d2fe" }}>Review Your Answers</h3>
+                  {questions.map((question: Question, index: number) => {
+                    const isCorrect = selectedAnswers[index] === question.correctAnswer;
+                    return (
+                      <div key={question.id} style={questionItemStyle}>
+                        <div style={questionNumberStyle}>Q{index + 1}: {isCorrect ? "✅ Correct" : "❌ Incorrect"}</div>
+                        <div style={questionTextStyle}>{question.question}</div>
+                        
+                        <div style={{ fontSize: "14px", marginTop: "10px" }}>
+                          <div style={{ color: "#c7d2fe", marginBottom: "8px" }}>
+                            <strong>Your Answer:</strong>
+                          </div>
+                          <div style={answerStyle(isCorrect)}>
+                            {selectedAnswers[index] || "Not answered"}
+                          </div>
+                        </div>
+
+                        {!isCorrect && (
+                          <div style={{ fontSize: "14px", marginTop: "10px" }}>
+                            <div style={{ color: "#c7d2fe", marginBottom: "8px" }}>
+                              <strong>Correct Answer:</strong>
+                            </div>
+                            <div style={answerStyle(true)}>
+                              {question.correctAnswer}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              <h1 style={titleStyle}>Take a Quiz First!</h1>
+              <div style={detailsStyle}>Complete a quiz to see your results here.</div>
+            </>
+          )}
+          
+          <div style={buttonsStyle}>
             <button 
-              style={{
-                ...buttonStyle,
-                backgroundColor: showReview ? "#ef4444" : "#10b981",
-                marginTop: "25px"
-              }}
-              onClick={() => setShowReview(!showReview)}
+              style={retakeBtnStyle} 
+              onClick={() => navigate("/quiz")}
               onMouseEnter={(e) => handleButtonHover(e, true)}
               onMouseLeave={(e) => handleButtonHover(e, false)}
             >
-              {showReview ? "Hide Answers" : "Review Your Answers"}
+              {hasData ? "Retake Quiz" : "Start Quiz"}
             </button>
-
-            {/* Display all questions with answers */}
-            {showReview && (
-            <div style={{ marginTop: "30px", textAlign: "left" }}>
-              <h3 style={{ fontSize: "20px", marginBottom: "20px", color: "#c7d2fe" }}>Review Your Answers</h3>
-              {questions.map((question: Question, index: number) => {
-                const isCorrect = selectedAnswers[index] === question.correctAnswer;
-                return (
-                  <div key={question.id} style={questionItemStyle}>
-                    <div style={questionNumberStyle}>Q{index + 1}: {isCorrect ? "✅ Correct" : "❌ Incorrect"}</div>
-                    <div style={questionTextStyle}>{question.question}</div>
-                    
-                    <div style={{ fontSize: "14px", marginTop: "10px" }}>
-                      <div style={{ color: "#c7d2fe", marginBottom: "8px" }}>
-                        <strong>Your Answer:</strong>
-                      </div>
-                      <div style={answerStyle(isCorrect)}>
-                        {selectedAnswers[index] || "Not answered"}
-                      </div>
-                    </div>
-
-                    {!isCorrect && (
-                      <div style={{ fontSize: "14px", marginTop: "10px" }}>
-                        <div style={{ color: "#c7d2fe", marginBottom: "8px" }}>
-                          <strong>Correct Answer:</strong>
-                        </div>
-                        <div style={answerStyle(true)}>
-                          {question.correctAnswer}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-            )}
-          </>
-        ) : (
-          <>
-            <h1 style={titleStyle}>Take a Quiz First!</h1>
-            <div style={detailsStyle}>Complete a quiz to see your results here.</div>
-          </>
-        )}
-        
-        <div style={buttonsStyle}>
-          <button 
-            style={retakeBtnStyle} 
-            onClick={() => navigate("/quiz")}
-            onMouseEnter={(e) => handleButtonHover(e, true)}
-            onMouseLeave={(e) => handleButtonHover(e, false)}
-          >
-            {hasData ? "Retake Quiz" : "Start Quiz"}
-          </button>
-          <button 
-            style={homeBtnStyle} 
-            onClick={() => navigate("/")}
-            onMouseEnter={(e) => handleButtonHover(e, true)}
-            onMouseLeave={(e) => handleButtonHover(e, false)}
-          >
-            Back to Home
-          </button>
+            <button 
+              style={homeBtnStyle} 
+              onClick={() => navigate("/")}
+              onMouseEnter={(e) => handleButtonHover(e, true)}
+              onMouseLeave={(e) => handleButtonHover(e, false)}
+            >
+              Back to Home
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
 export default Result;
+
